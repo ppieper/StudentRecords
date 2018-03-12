@@ -6,15 +6,14 @@
 using namespace std;
 
 /**
- * @brief recordExists - Checks that the student record exists in the db, given
- *                       an id. The db is sorted so we can do this in O(1) time.
+ * @brief inRange - Checks that the given id is within the valid range of ids.
  * @param id
- * @return true if record exists in the database, false if not
+ * @return true if id is within range, false if not
  */
 bool StudentDatabase::inRange(long id)
 {
     // check that the provided id is within range
-    return !(id < 0);
+    return !(id < 0 || id >= m_sys_id);
 }
 
 /**
@@ -129,10 +128,7 @@ void StudentDatabase::printAllRecords()
     set<StudentRecord>::iterator it = m_records.begin();
     for(; it != m_records.end(); it++)
     {
-        cout << "Id: " << it->getId() << endl;
-        cout << "Name: " << it->getFirstName() << " " << it->getLastName() << endl;
-        cout << "Year: " << getYearString(it->getYear()) << endl;
-        cout << "Gender: " << (it->getGender() == male ? "male" : "female") << endl;
+        printRecord(&(*it));
     }
 }
 
@@ -148,10 +144,7 @@ void StudentDatabase::printAllInYear(Year year)
     {
         if(it->getYear() == year)
         {
-            cout << "Id: " << it->getId() << endl;
-            cout << "Name: " << it->getFirstName() << " " << it->getLastName() << endl;
-            cout << "Year: " << getYearString(it->getYear()) << endl;
-            cout << "Gender: " << (it->getGender() == male ? "male" : "female") << endl;
+            printRecord(&(*it));
         }
     }
 }
