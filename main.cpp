@@ -16,7 +16,6 @@ int main()
     records.addRecord("Alaska","",freshman,female);
     records.addRecord("Detox","",sophomore,male);
     records.addRecord("Roxxxy","Andrews",junior,female);
-    records.addRecord("Paul","Pieper",sophomore,male);
 
     // print all sophomores
     cout << endl << "Listing sophomores:" << endl;

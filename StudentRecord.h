@@ -32,11 +32,6 @@ public:
     Year getYear() const {return m_year;}
     Gender getGender() const {return m_gender;}
 
-    bool operator<(const StudentRecord& record) const
-    {
-        return (record.m_id < m_id);
-    }
-
 private:
     long m_id;
     std::string m_firstName;

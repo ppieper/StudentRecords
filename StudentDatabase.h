@@ -5,6 +5,14 @@
 #include <string>
 #include <StudentRecord.h>
 
+const int SUCCESS          = 0;
+const int ERR_NOT_FOUND    = 1;
+const int ERR_OUT_OF_RANGE = 2;
+const int ERR_DUPLICATE_ID = 3;
+
+/**
+ * @brief The StudentDatabase class
+ */
 class StudentDatabase
 {
 public:
