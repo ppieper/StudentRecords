@@ -51,68 +51,6 @@ void StudentApp::displayMainMenu()
     cout << "\nSelect your choice :=> ";
 }
 
-/**
- * @brief StudentApp::promptSave - Prompt user to save db to file
- *
- *                                 User inputs a filename and a new
- *                                 file is created with the db data
- */
-void StudentApp::promptSave()
-{
-    string saveFile;
-    cout << "Enter filename to save or 'q' to return to menu :=> ";
-    cin >> saveFile;
-    cin.ignore();
-    if (saveFile == "q")
-        return;
-    if(m_database.saveAllRecords(saveFile))
-    {
-        cout << "There was a problem saving " << saveFile << '\n';
-        promptContinue();
-        return;
-    }
-    cout << "Successfully saved " << saveFile << '\n';
-    promptContinue();
-    return;
-}
-
-/**
- * @brief StudentApp::promptLoad - Prompt the user to load a file
- *
- *                                 User inputs a filename and the
- *                                 new db is constructed
- */
-void StudentApp::promptLoad()
-{
-    string loadFile;
-    char choice;
-    do
-    {
-        cout << "Load from a file? Current db will be lost (y/n) :=> ";
-        cin >> choice;
-        cin.ignore();
-        choice = tolower(choice);
-        if(choice == 'n')
-            return;
-        else if(choice == 'y')
-        {
-            cout << "Enter filename to load or 'q' to return to menu :=> ";
-            cin >> loadFile;
-            cin.ignore();
-            if (loadFile == "q")
-                return;
-            if(m_database.loadSaveFile(loadFile)) // attempt to load the file
-            {
-                std::cout << "Could not find file: " << loadFile << "\n";
-                promptContinue();
-                return;
-            }
-            std::cout << "Successfully loaded the file: " << loadFile << "\n";
-            promptContinue();
-            return;
-        }
-    } while (choice !='n' && choice != 'y');
-}
 
 /**
  * @brief StudentApp::promptPrintStudent - Prompt the user to print out a student record
@@ -133,9 +71,11 @@ void StudentApp::promptPrintStudent()
         cout << "\n";
     } while (choice !="q" && !isIdValid(choice));
 
+    // quit to menu
     if(choice == "q")
         return;
 
+    // else look up the record
     int id;
     id = stoi(choice);
     const StudentRecord* record = m_database.findRecord(id);
@@ -195,6 +135,113 @@ void StudentApp::printAllRecords()
     cout << "\n====== PRINT ALL RECORDS ======\n";
     m_database.printAllRecords();
     promptContinue();
+}
+
+/**
+ * @brief StudentApp::promptFirstName - Prompt user for a first name string input
+ * @return
+ */
+string StudentApp::promptFirstName(string original)
+{
+    string choice;
+    do
+    {
+        cout << "\nPress 'q' to return to menu\n";
+        cout << "\nEnter a first name (mininum 2 chars):=> ";
+        cin >> choice;
+        cin.ignore();
+        cout << "\n";
+    } while (choice !="q" && choice.length() < 2);
+
+    if (choice == "q")
+        return original;
+    else
+        return choice;
+}
+
+/**
+ * @brief StudentApp::promptLastName - Prompt user for a last name string input
+ * @return
+ */
+string StudentApp::promptLastName(string original)
+{
+    string choice;
+    do
+    {
+        cout << "\nPress 'q' to return to menu\n";
+        cout << "\nEnter a last name (minimun 2 chars):=> ";
+        cin >> choice;
+        cin.ignore();
+        cout << "\n";
+    } while (choice !="q" && choice.length() < 2);
+
+    if (choice == "q")
+        return original;
+    else
+        return choice;
+}
+
+/**
+ * @brief StudentApp::promptYear - Prompt user to make a year selection
+ * @return
+ */
+Year StudentApp::promptYear()
+{
+    Year year = freshman;
+    char choice;
+    do
+    {
+        cout << "1. (F)reshman\n";
+        cout << "2. Sophomor(e)\n";
+        cout << "3. (J)unior\n";
+        cout << "4. (S)enior\n";
+        cout << "Press 'q' to return to menu\n";
+        cout << "\nSelect your choice :=> ";
+        cin >> choice;
+        cin.ignore();
+        choice = tolower(choice);
+        cout << "\n";
+        switch (choice)
+        {
+            case '1': case 'f': year = freshman; return year; break;
+            case '2': case 'e': year = sophomore; return year; break;
+            case '3': case 'j': year = junior; return year; break;
+            case '4': case 's': year = senior; return year; break;
+            case 'q': return freshman; break;
+            default: break;
+        }
+    } while (choice !='q' && (choice > 4 || choice < 1));
+
+    return year;
+}
+
+/**
+ * @brief StudentApp::promptGender - Prompt user to make a gender selection
+ * @return
+ */
+Gender StudentApp::promptGender()
+{
+    Gender gender = male;
+    char choice;
+    do
+    {
+        cout << "1. (M)ale\n";
+        cout << "2. (F)emale\n";
+        cout << "Press 'q' to return to menu\n";
+        cout << "\nSelect your choice :=> ";
+        cin >> choice;
+        cin.ignore();
+        choice = tolower(choice);
+        cout << "\n";
+        switch (choice)
+        {
+            case '1': case 'm': gender = male; return gender; break;
+            case '2': case 'f': gender = female; return gender; break;
+            case 'q': return male; break;
+            default: break;
+        }
+    } while (choice !='q' && (choice > 2 || choice < 1));
+    return gender;
 }
 
 /**
@@ -305,7 +352,6 @@ void StudentApp::promptRemoveStudent()
             {
                 cout << "--Successfully deleted student id " << id << endl << '\n';
             }
-
             promptContinue();
             return;
         }
@@ -344,7 +390,6 @@ void StudentApp::promptModifyStudent()
         promptContinue();
         return;
     }
-
     string firstName = record->getFirstName();
     string lastName = record->getLastName();
     Year year = record->getYear();
@@ -381,15 +426,12 @@ void StudentApp::promptModifyStudent()
                                 }
                                 else
                                     goto Modifying;
-                                    break;
+                                break;
             case 'q': return; break;
             default: break;
         }
     } while (choice !='q' && (choice > 5 || choice < 1));
     Modifying:
-
-    if(choice == 'q')
-        return;
 
     if(m_database.updateRecord(id,firstName,lastName,year,gender))
     {
@@ -398,115 +440,64 @@ void StudentApp::promptModifyStudent()
     }
     else
         cout << "Update Successful\n";
-
     promptContinue();
 }
 
 /**
- * @brief StudentApp::promptFirstName - Prompt user for a first name string input
- * @return
+ * @brief StudentApp::promptSave - Prompt user to save db to file
+ *
+ *                                 User inputs a filename and a new
+ *                                 file is created with the db data
  */
-string StudentApp::promptFirstName(string original)
+void StudentApp::promptSave()
 {
-    string choice;
-    do
-    {
-        cout << "\nPress 'q' to return to menu\n";
-        cout << "\nEnter a first name (mininum 2 chars):=> ";
-        cin >> choice;
-        cin.ignore();
-        cout << "\n";
-    } while (choice !="q" && choice.length() < 2);
-
-    if (choice == "q")
-        return original;
+    string saveFile;
+    cout << "Enter filename to save or 'q' to return to menu :=> ";
+    cin >> saveFile;
+    cin.ignore();
+    if (saveFile == "q")
+        return;
+    if(m_database.saveAllRecords(saveFile))
+        cout << "There was a problem saving " << saveFile << '\n';
     else
-        return choice;
+        cout << "Successfully saved " << saveFile << '\n';
+    promptContinue();
+    return;
 }
 
 /**
- * @brief StudentApp::promptLastName - Prompt user for a last name string input
- * @return
+ * @brief StudentApp::promptLoad - Prompt the user to load a file
+ *
+ *                                 User inputs a filename and the
+ *                                 new db is constructed
  */
-string StudentApp::promptLastName(string original)
+void StudentApp::promptLoad()
 {
-    string choice;
-    do
-    {
-        cout << "\nPress 'q' to return to menu\n";
-        cout << "\nEnter a last name (minimun 2 chars):=> ";
-        cin >> choice;
-        cin.ignore();
-        cout << "\n";
-    } while (choice !="q" && choice.length() < 2);
-
-    if (choice == "q")
-        return original;
-    else
-        return choice;
-}
-
-/**
- * @brief StudentApp::promptYear - Prompt user to make a year selection
- * @return
- */
-Year StudentApp::promptYear()
-{
-    Year year = freshman;
+    string loadFile;
     char choice;
     do
     {
-        cout << "1. (F)reshman\n";
-        cout << "2. Sophomor(e)\n";
-        cout << "3. (J)unior\n";
-        cout << "4. (S)enior\n";
-        cout << "Press 'q' to return to menu\n";
-        cout << "\nSelect your choice :=> ";
+        cout << "Load from a file? Current db will be lost (y/n) :=> ";
         cin >> choice;
         cin.ignore();
         choice = tolower(choice);
-        cout << "\n";
-        switch (choice)
+        if(choice == 'n')
+            return;
+        else if(choice == 'y')
         {
-            case '1': case 'f': year = freshman; return year; break;
-            case '2': case 'e': year = sophomore; return year; break;
-            case '3': case 'j': year = junior; return year; break;
-            case '4': case 's': year = senior; return year; break;
-            case 'q': return freshman; break;
-            default: break;
+            cout << "Enter filename to load or 'q' to return to menu :=> ";
+            cin >> loadFile;
+            cin.ignore();
+            if (loadFile == "q")
+                return;
+            if(m_database.loadSaveFile(loadFile)) // attempt to load the file
+                cout << "Could not find file: " << loadFile << "\n";
+            else
+                cout << "Successfully loaded the file: " << loadFile << "\n";
+            promptContinue();
+            return;
         }
-    } while (choice !='q' && (choice > 4 || choice < 1));
-
-    return year;
-}
-
-/**
- * @brief StudentApp::promptGender - Prompt user to make a gender selection
- * @return
- */
-Gender StudentApp::promptGender()
-{
-    Gender gender = male;
-    char choice;
-    do
-    {
-        cout << "1. (M)ale\n";
-        cout << "2. (F)emale\n";
-        cout << "Press 'q' to return to menu\n";
-        cout << "\nSelect your choice :=> ";
-        cin >> choice;
-        cin.ignore();
-        choice = tolower(choice);
-        cout << "\n";
-        switch (choice)
-        {
-            case '1': case 'm': gender = male; return gender; break;
-            case '2': case 'f': gender = female; return gender; break;
-            case 'q': return male; break;
-            default: break;
-        }
-    } while (choice !='q' && (choice > 2 || choice < 1));
-    return gender;
+    } while (choice !='n' && choice != 'y');
 }
 
 /**
