@@ -5,7 +5,7 @@ using namespace std;
 
 /**
  * @brief StudentApp::run - Run the program until the user
- *                          inputs that they want to quit
+ *                          inputs that they want to Quit
  */
 void StudentApp::run()
 {
@@ -51,7 +51,6 @@ void StudentApp::displayMainMenu()
     cout << "\nSelect your choice :=> ";
 }
 
-
 /**
  * @brief StudentApp::promptPrintStudent - Prompt the user to print out a student record
  *
@@ -60,35 +59,21 @@ void StudentApp::displayMainMenu()
  */
 void StudentApp::promptPrintStudent()
 {
-    string choice;
-    do
-    {
-        cout << "\n====== PRINT STUDENTS RECORD ======\n";
-        cout << "Press 'q' to return to menu\n";
-        cout << "\nEnter a 9-digit student id :=> ";
-        cin >> choice;
-        cin.ignore();
-        cout << "\n";
-    } while (choice !="q" && !isIdValid(choice));
+    cout << "\n====== PRINT STUDENTS RECORD ======\n";
+    int id = promptStudentId();
 
-    // quit to menu
-    if(choice == "q")
+    // Quit to menu
+    if(!id)
         return;
 
     // else look up the record
-    int id;
-    id = stoi(choice);
-    const StudentRecord* record = m_database.findRecord(id);
+    const StudentRecord* record = findRecord(id);
     if(!record)
-    {
-        cout << "Lookup failed:" << endl << "--No record exists with student id "
-             << padIdWithZeroes(id) << endl << '\n';
-    }
-    else
-    {
-        cout << "Lookup Successful:\n" << endl;
-        m_database.printRecord(record);
-    }
+        return;
+
+    // print the record
+    m_database.printRecord(record);
+
     promptContinue();
 }
 
@@ -100,31 +85,17 @@ void StudentApp::promptPrintStudent()
  */
 void StudentApp::promptPrintStudentsInYear()
 {
-    Year year;
-    char choice;
-    choice = tolower(choice);
-    do
+    cout << "\n====== PRINT STUDENTS IN YEAR ======\n";
+    Year year = promptYear(no_year);
+    switch (year)
     {
-        cout << "\n====== PRINT STUDENTS IN YEAR ======\n";
-        cout << "1. (F)reshman\n";
-        cout << "2. Sophomor(e)\n";
-        cout << "3. (J)unior\n";
-        cout << "4. (S)enior\n";
-        cout << "Press 'q' to return to menu\n";
-        cout << "\nSelect your choice :=> ";
-        cin >> choice;
-        cin.ignore();
-        cout << "\n";
-        switch (choice)
-        {
-            case '1': case 'f': year = freshman; m_database.printAllInYear(year); promptContinue(); break;
-            case '2': case 'e': year = sophomore; m_database.printAllInYear(year); promptContinue(); break;
-            case '3': case 'j': year = junior; m_database.printAllInYear(year); promptContinue(); break;
-            case '4': case 's': year = senior; m_database.printAllInYear(year); promptContinue(); break;
-            case 'q': return; break;
-            default: break;
-        }
-    } while (choice !='q' && (choice > 4 || choice < 1));
+        case freshman: m_database.printAllInYear(year); promptContinue(); break;
+        case sophomore: m_database.printAllInYear(year); promptContinue(); break;
+        case junior: m_database.printAllInYear(year); promptContinue(); break;
+        case senior: m_database.printAllInYear(year); promptContinue(); break;
+        case no_year: return; break;
+        default: break;
+    }
 }
 
 /**
@@ -138,22 +109,44 @@ void StudentApp::printAllRecords()
 }
 
 /**
+ * @brief StudentApp::promptStudentId - Prompt user for a 9-digit student id input
+ * @returns int id - a valid student id or 0 if user Quit
+ */
+int StudentApp::promptStudentId()
+{
+    string choice;
+    do
+    {
+        cout << "Press 'q' to return to menu\n";
+        cout << "\nEnter a 9-digit student id :=> ";
+        cin >> choice;
+        cin.ignore();
+        cout << endl;
+    } while (choice !="q" && choice != "Q" && !isIdValid(choice));
+
+    if (choice == "q" || choice == "Q")
+        return 0;
+    else
+        return stoi(choice);
+}
+
+/**
  * @brief StudentApp::promptFirstName - Prompt user for a first name string input
- * @return
+ * @return string firstName - the chosen firstName or the original by default
  */
 string StudentApp::promptFirstName(string original)
 {
     string choice;
     do
     {
-        cout << "\nPress 'q' to return to menu\n";
-        cout << "\nEnter a first name (mininum 2 chars):=> ";
+        cout << "\nEnter a first name (minimum 2 chars)\n";
+        cout << "Press 'q' to return to menu\n";
+        cout << "\nEnter your choice :=> ";
         cin >> choice;
         cin.ignore();
-        cout << "\n";
-    } while (choice !="q" && choice.length() < 2);
+    } while (choice !="q" && choice != "Q" && choice.length() < 2);
 
-    if (choice == "q")
+    if (choice == "q" || choice == "Q")
         return original;
     else
         return choice;
@@ -161,21 +154,21 @@ string StudentApp::promptFirstName(string original)
 
 /**
  * @brief StudentApp::promptLastName - Prompt user for a last name string input
- * @return
+ * @return string lastName - the chosen lastName or the original by default
  */
 string StudentApp::promptLastName(string original)
 {
     string choice;
     do
     {
+        cout << "\nEnter a last name (minimum 2 chars)\n";
         cout << "\nPress 'q' to return to menu\n";
-        cout << "\nEnter a last name (minimun 2 chars):=> ";
+        cout << "\nEnter your choice :=> ";
         cin >> choice;
         cin.ignore();
-        cout << "\n";
-    } while (choice !="q" && choice.length() < 2);
+    } while (choice !="q" && choice != "Q" && choice.length() < 2);
 
-    if (choice == "q")
+    if (choice == "q" || choice == "Q")
         return original;
     else
         return choice;
@@ -183,9 +176,9 @@ string StudentApp::promptLastName(string original)
 
 /**
  * @brief StudentApp::promptYear - Prompt user to make a year selection
- * @return
+ * @return Year year - the selected year or 'freshman' by default
  */
-Year StudentApp::promptYear()
+Year StudentApp::promptYear(Year original)
 {
     Year year = freshman;
     char choice;
@@ -200,26 +193,25 @@ Year StudentApp::promptYear()
         cin >> choice;
         cin.ignore();
         choice = tolower(choice);
-        cout << "\n";
         switch (choice)
         {
-            case '1': case 'f': year = freshman; return year; break;
-            case '2': case 'e': year = sophomore; return year; break;
-            case '3': case 'j': year = junior; return year; break;
-            case '4': case 's': year = senior; return year; break;
-            case 'q': return freshman; break;
+            case '1': case 'f': year = freshman; goto Done; break;
+            case '2': case 'e': year = sophomore; goto Done; break;
+            case '3': case 'j': year = junior; goto Done; break;
+            case '4': case 's': year = senior; goto Done; break;
+            case 'q': return original; break;
             default: break;
         }
     } while (choice !='q' && (choice > 4 || choice < 1));
-
+    Done:
     return year;
 }
 
 /**
  * @brief StudentApp::promptGender - Prompt user to make a gender selection
- * @return
+ * @return Gender gender - the chosen gender or 'male' by default
  */
-Gender StudentApp::promptGender()
+Gender StudentApp::promptGender(Gender original)
 {
     Gender gender = male;
     char choice;
@@ -232,12 +224,11 @@ Gender StudentApp::promptGender()
         cin >> choice;
         cin.ignore();
         choice = tolower(choice);
-        cout << "\n";
         switch (choice)
         {
             case '1': case 'm': gender = male; return gender; break;
             case '2': case 'f': gender = female; return gender; break;
-            case 'q': return male; break;
+            case 'q': return original; break;
             default: break;
         }
     } while (choice !='q' && (choice > 2 || choice < 1));
@@ -253,50 +244,17 @@ Gender StudentApp::promptGender()
  */
 void StudentApp::promptAddStudent()
 {
-    string firstName = "Jane";
-    string lastName = "Doe";
-    Year year = freshman;
-    Gender gender = male;
-    char choice;
-    do
-    {
-        cout << "\n====== ADD STUDENT RECORD ======\n";
-        cout << "========= # " << padIdWithZeroes(m_database.getCurrentId()) << " ==========\n";
-        cout << "1. (F)irst name - " << firstName << "\n";
-        cout << "2. (L)ast name - " << lastName << "\n";
-        cout << "3. (Y)ear - " << m_database.getYearString(year) << "\n";
-        cout << "4. (G)ender - " << (gender == male ? "male" : "female") << "\n";
-        cout << "5. (S)ave Record\n";
-        cout << "Press 'q' to return to menu\n";
-        cout << "\nSelect your choice :=> ";
-        cin >> choice;
-        cin.ignore();
-        choice = tolower(choice);
-        cout << "\n";
-        switch (choice)
-        {
-            case '1': case 'f': firstName = promptFirstName(firstName); break;
-            case '2': case 'l': lastName = promptLastName(lastName); break;
-            case '3': case 'y': year = promptYear(); break;
-            case '4': case 'g': gender = promptGender(); break;
-            case '5': case 's': if(firstName.length() < 2 || lastName.length() < 2)
-                                {
-                                    cout << "Failure--Please be sure to enter a first & last name\n";
-                                    promptContinue();
-                                }
-                                else
-                                    goto Saving;
-                                break;
-            case 'q': return; break;
-            default: break;
-        }
-    } while (choice !='q' && (choice > 5 || choice < 1));
-    Saving:
+    cout << "\n====== ADD STUDENT RECORD ======\n";
+    int exitCode = promptEditRecordFields(nullptr);
 
-    if(m_database.addRecord(firstName,lastName,year,gender))
-        cout << "Unable to add student to the database";
+    // Quit to menu
+    if(exitCode == -1)
+        return;
+
+    if(exitCode)
+        cout << "Unable to add student to the database" << endl;
     else
-        cout << "Successfully added student to the database\n";
+        cout << "Successfully added student to the database" << endl;
     promptContinue();
 }
 
@@ -305,30 +263,19 @@ void StudentApp::promptAddStudent()
  */
 void StudentApp::promptRemoveStudent()
 {
-    string idChoice;
-    do
-    {
-        cout << "\n====== REMOVE STUDENTS RECORD ======\n";
-        cout << "Press 'q' to return to menu\n";
-        cout << "\nEnter a 9-digit student id :=> ";
-        cin >> idChoice;
-        cin.ignore();
-        cout << "\n";
-    } while (idChoice !="q" && !isIdValid(idChoice));
+    cout << "\n====== REMOVE STUDENTS RECORD ======\n";
+    int id = promptStudentId();
 
-    // quit to menu
-    if(idChoice == "q")
+    // Quit to menu
+    if(!id)
         return;
 
-    // display the record to be deleted first
-    int id = stoi(idChoice);
-    const StudentRecord* record = m_database.findRecord(id);
+    // otherwise, get the record to be removed
+    const StudentRecord* record = findRecord(id);
     if(!record)
-    {
-        cout << "\nNo record of student " << padIdWithZeroes(id) << " in database\n";
-        promptContinue();
         return;
-    }
+
+    // print it
     m_database.printRecord(record);
 
     // make sure the user really wants to delete this record
@@ -339,18 +286,19 @@ void StudentApp::promptRemoveStudent()
         cin >> choice;
         cin.ignore();
         choice = tolower(choice);
+        cout << endl;
         if(choice == 'n')
             return;
         else if(choice == 'y')
         {
             if (m_database.deleteRecord(id))
             {
-                cout << "Deletion failed:" << endl << "--No record exists with student id "
-                     << padIdWithZeroes(id) << endl << "\n";
+                cout << "\nDeletion failed\n--No record of student  "
+                     << padIdWithZeroes(id) << " in database\n" << endl;
             }
             else
             {
-                cout << "--Successfully deleted student id " << id << endl << '\n';
+                cout << "\nSuccessfully deleted student id " << id << '\n' << endl;
             }
             promptContinue();
             return;
@@ -366,80 +314,32 @@ void StudentApp::promptRemoveStudent()
  */
 void StudentApp::promptModifyStudent()
 {
-    string idChoice;
-    do
-    {
-        cout << "\n====== MODIFY STUDENT RECORD ======\n";
-        cout << "Press 'q' to return to menu\n";
-        cout << "\nEnter a 9-digit student id :=> ";
-        cin >> idChoice;
-        cin.ignore();
-        cout << "\n";
-    } while (idChoice !="q" && !isIdValid(idChoice));
+    cout << "\n====== MODIFY STUDENT RECORD ======\n";
+    int id = promptStudentId();
 
-    // quit to menu
-    if(idChoice == "q")
+    // Quit to menu
+    if(!id)
         return;
 
     // otherwise, get the record to be modified
-    int id = stoi(idChoice);
-    const StudentRecord* record = m_database.findRecord(id);
+    const StudentRecord* record = findRecord(id);
     if(!record)
-    {
-        cout << "\nNo record of student " << padIdWithZeroes(id) << " in database\n";
-        promptContinue();
         return;
-    }
-    string firstName = record->getFirstName();
-    string lastName = record->getLastName();
-    Year year = record->getYear();
-    Gender gender = record->getGender();
 
-    // display modification menu
-    char choice;
-    do
+    cout << "\n====== MODIFY STUDENT RECORD ======\n";
+    int exitCode = promptEditRecordFields(record);
+
+    // Quit to menu
+    if(exitCode == -1)
+        return;
+
+    if(exitCode)
     {
-        cout << "\n====== MODIFY STUDENT RECORD ======\n";
-        cout << "=========== # " << padIdWithZeroes(id) << " ===========\n";
-        cout << "1. (F)irst name - " << firstName << "\n";
-        cout << "2. (L)ast name - " << lastName << "\n";
-        cout << "3. (Y)ear - " << m_database.getYearString(year) << "\n";
-        cout << "4. (G)ender - " << (gender == male ? "male" : "female") << "\n";
-        cout << "5. (S)ave Record\n";
-        cout << "Press 'q' to return to menu\n";
-        cout << "\nSelect your choice :=> ";
-        cin >> choice;
-        cin.ignore();
-        choice = tolower(choice);
-        cout << "\n";
-
-        switch (choice)
-        {
-            case '1': case 'f': firstName = promptFirstName(firstName); break;
-            case '2': case 'l': lastName = promptLastName(lastName); break;
-            case '3': case 'y': year = promptYear(); break;
-            case '4': case 'g': gender = promptGender(); break;
-            case '5': case 's': if(firstName.length() < 2 || lastName.length() < 2)
-                                {
-                                    cout << "Failure--Please be sure to enter a first & last name\n";
-                                    promptContinue();
-                                }
-                                else
-                                    goto Modifying;
-                                break;
-            case 'q': return; break;
-            default: break;
-        }
-    } while (choice !='q' && (choice > 5 || choice < 1));
-    Modifying:
-
-    if(m_database.updateRecord(id,firstName,lastName,year,gender))
-    {
-        cout << "Update failed:" << endl << "--No record exists with student id "
-             << padIdWithZeroes(id) << endl << '\n';
+        cout << "Update failed:\n--No record exists with student id "
+             << padIdWithZeroes(id) << '\n' << endl;
     }
     else
-        cout << "Update Successful\n";
+        cout << "Update Successful" << endl;
     promptContinue();
 }
 
@@ -458,9 +358,9 @@ void StudentApp::promptSave()
     if (saveFile == "q")
         return;
     if(m_database.saveAllRecords(saveFile))
-        cout << "There was a problem saving " << saveFile << '\n';
+        cout << "There was a problem saving " << saveFile << endl;
     else
-        cout << "Successfully saved " << saveFile << '\n';
+        cout << "Successfully saved " << saveFile << endl;
     promptContinue();
     return;
 }
@@ -488,16 +388,79 @@ void StudentApp::promptLoad()
             cout << "Enter filename to load or 'q' to return to menu :=> ";
             cin >> loadFile;
             cin.ignore();
+            cout << endl;
             if (loadFile == "q")
                 return;
             if(m_database.loadSaveFile(loadFile)) // attempt to load the file
-                cout << "Could not find file: " << loadFile << "\n";
+                cout << "Could not find file: " << loadFile << endl;
             else
-                cout << "Successfully loaded the file: " << loadFile << "\n";
+                cout << "Successfully loaded the file: " << loadFile << endl;
             promptContinue();
             return;
         }
     } while (choice !='n' && choice != 'y');
+}
+
+/**
+ * @brief StudentApp::promptEditRecordFields - Prompt user to edit record fields
+ * @param record
+ * @returns 0 if successful, 1 or 2 if failure, -1 if quit
+ */
+int StudentApp::promptEditRecordFields(const StudentRecord* record)
+{
+    // default values
+    string firstName = "Jane";
+    string lastName = "Doe";
+    Year year = freshman;
+    Gender gender = male;
+
+    // if we are given a record, use its values
+    if(record)
+    {
+        firstName = record->getFirstName();
+        lastName = record->getLastName();
+        year = record->getYear();
+        gender = record->getGender();
+    }
+    // present the user with a menu & wait for input
+    char choice;
+    do
+    {
+        cout << "========= # " << padIdWithZeroes(record ? record->getId() : m_database.getCurrentId())
+             << " ==========\n";
+        cout << "1. (F)irst name - " << firstName << "\n";
+        cout << "2. (L)ast name - " << lastName << "\n";
+        cout << "3. (Y)ear - " << m_database.getYearString(year) << "\n";
+        cout << "4. (G)ender - " << (gender == male ? "male" : "female") << "\n";
+        cout << "5. (S)ave Record\n";
+        cout << "Press 'q' to return to menu\n";
+        cout << "\nSelect your choice :=> ";
+        cin >> choice;
+        cin.ignore();
+        choice = tolower(choice);
+        cout << endl;
+        switch (choice)
+        {
+            case '1': case 'f': firstName = promptFirstName(firstName); break;
+            case '2': case 'l': lastName = promptLastName(lastName); break;
+            case '3': case 'y': year = promptYear(year); break;
+            case '4': case 'g': gender = promptGender(gender); break;
+            case '5': case 's': if(firstName.length() < 2 || lastName.length() < 2)
+                                {
+                                    cout << "--Failed to save record; please be sure to "
+                                            "enter a valid first & last name" << endl;
+                                    promptContinue();
+                                }
+                                else
+                                    return (record ? m_database.updateRecord(record->getId(), firstName,
+                                                                             lastName, year, gender)
+                                                   : m_database.addRecord(firstName,lastName,year,gender));
+                                break;
+            case 'q': return -1; break;
+            default: break;
+        }
+    } while (choice !='q' && (choice > 5 || choice < 1));
+    return -1;
 }
 
 /**
@@ -509,7 +472,7 @@ void StudentApp::promptContinue()
 {
     cout << "Press enter to continue :=> ";
     cin.ignore();
-    cout << "\n";
+    cout << endl;
 }
 
 /**
@@ -520,4 +483,22 @@ void StudentApp::promptContinue()
 bool StudentApp::isIdValid(string id)
 {
     return (id.length() < 10 && stoi(id) > 0);
+}
+
+/**
+ * @brief StudentApp::findRecord - Search for a record in the database given an id
+ * @param id
+ * @returns a record pointer if successful, nullptr if not
+ */
+const StudentRecord* StudentApp::findRecord(int id)
+{
+    const StudentRecord* record = m_database.findRecord(id);
+    if(!record)
+    {
+        cout << "\nLookup failed:\n--No record of student "
+             << padIdWithZeroes(id) << " in database\n" << endl;
+        promptContinue();
+        return nullptr;
+    }
+    return record;
 }

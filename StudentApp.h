@@ -15,21 +15,24 @@ public:
     }
 
     void run();
-    void promptLoad();
-    void promptSave();
-    void promptContinue();
     void displayMainMenu();
     void printAllRecords();
     bool isIdValid(std::string);
+    const StudentRecord* findRecord(int);
 
     void promptAddStudent();
     void promptRemoveStudent();
     void promptModifyStudent();
+    void promptLoad();
+    void promptSave();
+    void promptContinue();
+    int promptEditRecordFields(const StudentRecord*);
 
+    int promptStudentId();
     std::string promptFirstName(std::string);
     std::string promptLastName(std::string);
-    Year promptYear();
-    Gender promptGender();
+    Year promptYear(Year);
+    Gender promptGender(Gender);
 
     void promptPrintStudent();
     void promptPrintStudentsInYear();

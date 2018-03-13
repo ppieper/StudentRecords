@@ -104,6 +104,7 @@ void StudentDatabase::printRecord(const StudentRecord* record)
  */
 void StudentDatabase::printAllRecords()
 {
+    cout << "Printing all student records...\n\n";
     set<StudentRecord>::iterator it = m_records.begin();
     for(; it != m_records.end(); it++)
     {
@@ -119,6 +120,7 @@ void StudentDatabase::printAllRecords()
 void StudentDatabase::printAllInYear(Year year)
 {
     set<StudentRecord>::iterator it = m_records.begin();
+    cout << "Printing all " << getYearString(year) << " students...\n\n";
     for(; it != m_records.end(); it++)
     {
         if(it->getYear() == year)

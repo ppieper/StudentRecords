@@ -3,9 +3,9 @@
 
 #include <string>
 
-enum Gender {male, female};
-enum Year {freshman, sophomore, junior, senior};
-static const char* yearStrings[] = {"freshman", "sophomore", "junior", "senior"};
+enum Gender {male, female, no_gender};
+enum Year {freshman, sophomore, junior, senior, no_year};
+static const char* yearStrings[] = {"freshman", "sophomore", "junior", "senior", ""};
 
 /**
  * @brief The StudentRecord class
