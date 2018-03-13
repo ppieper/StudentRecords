@@ -3,6 +3,7 @@
 
 #include <string>
 #include <StudentRecord.h>
+#include <StudentDatabase.h>
 
 /**
  * @brief The StudentApp class

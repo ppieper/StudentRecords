@@ -6,9 +6,14 @@
 
 using namespace std;
 
+StudentApp::StudentApp()
+{
+
+}
+
 void StudentApp::run()
 {
-    m_records = StudentDatabase(""); // get our blank database
+    m_records = StudentDatabase(); // get our blank database
     char choice;
     do
     {
@@ -96,7 +101,7 @@ void StudentApp::promptLoad()
             cout << "Enter filename to load :=> ";
             cin >> loadFile;
             cin.ignore();
-            m_records = StudentDatabase(loadFile);
+            m_records.loadSaveFile(loadFile); // attempt to load the file
             return;
         }
     } while (choice !='n' && choice != 'y');
@@ -225,7 +230,7 @@ void StudentApp::promptAddStudent()
     if(m_records.addRecord(firstName,lastName,year,gender))
         cout << "Unable to add student to the database";
     else
-        cout << "Successfully added student to the database";
+        cout << "Successfully added student to the database\n";
     promptContinue();
 }
 
@@ -316,6 +321,7 @@ void StudentApp::promptModifyStudent()
     if(!record)
     {
         cout << "\nNo record of student " << id << " in database\n";
+        promptContinue();
         return;
     }
 

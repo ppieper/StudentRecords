@@ -18,34 +18,13 @@ const int ERR_DUPLICATE_ID = 3;
 class StudentDatabase
 {
 public:
+    StudentDatabase(){
+        m_sys_id = 0;
+    }
+
     StudentDatabase(std::string filePath){
         m_sys_id = 0;
-
-        // no file given
-        if(filePath.empty())
-            return;
-
-        std::ifstream inFile(filePath);
-
-        // file given is not valid
-        if(!inFile)
-        {
-            std::cout << "Could not find file: " << filePath << "\n";
-            return;
-        }
-
-        // else load file
-        long id = 0;
-        std::string firstName, lastName;
-        int year;
-        int gender;
-        while (inFile.good())
-        {
-            inFile >> id; inFile >> firstName >> lastName >> year >> gender;
-            m_records.insert(StudentRecord(id,firstName,lastName,(Year)year,(Gender)gender));
-            m_sys_id = id + 1;
-        }
-        inFile.close();
+        loadSaveFile(filePath);
     }
 
     std::set<StudentRecord, StudentRecordCompare> getDatabase() const {return m_records;}
@@ -63,6 +42,44 @@ public:
     void printAllRecords();
     void printRecord(const StudentRecord*);
     void saveAllRecords(std::string);
+
+    void loadSaveFile(std::string filePath)
+    {
+        // no file given
+        if(filePath.empty())
+            return;
+
+        std::ifstream inFile(filePath);
+
+        // file given is not valid
+        if(!inFile)
+        {
+            std::cout << "Could not find file: " << filePath << "\n";
+            std::cout << "Press enter to continue :=> ";
+            std::cin.ignore();
+            std::cout << "\n";
+            return;
+        }
+
+        // else load file
+        m_records.clear(); // in case of loading a new db from the user app
+
+        long id = 0;
+        std::string firstName, lastName;
+        int year;
+        int gender;
+        while (inFile.good())
+        {
+            inFile >> id; inFile >> firstName >> lastName >> year >> gender;
+            m_records.insert(StudentRecord(id,firstName,lastName,(Year)year,(Gender)gender));
+            m_sys_id = id + 1;
+        }
+        std::cout << "Successfully loaded the file: " << filePath << "\n";
+        std::cout << "Press enter to continue :=> ";
+        std::cin.ignore();
+        std::cout << "\n";
+        inFile.close();
+    }
 
 private:
     std::set<StudentRecord, StudentRecordCompare> m_records;
