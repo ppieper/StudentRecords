@@ -1,29 +1,25 @@
 #include <StudentDatabase.h>
-#include <string>
-#include <set>
 #include <iostream>
 
 using namespace std;
 
 /**
- * @brief recordExists - Checks that the student record exists in the db, given
- *                       an id. The db is sorted so we can do this in O(1) time.
+ * @brief inRange - Checks that the given id is within the valid range of ids
  * @param id
- * @return true if record exists in the database, false if not
+ * @returns true if id is within range, false if it is not
  */
-bool StudentDatabase::inRange(long id)
+bool StudentDatabase::inRange(int id)
 {
-    // check that the provided id is within range
-    return !(id < 0);
+    return !(id < 0 || id >= m_sys_id);
 }
 
 /**
  * @brief findRecord - Search for a student record given an id and return a
- *                     pointer to it.
+ *                     pointer to it
  * @param id
- * @return StudentRecord* if successful, nullptr
+ * @returns StudentRecord* if successful, nullptr if failure
  */
-const StudentRecord* StudentDatabase::findRecord(long id)
+const StudentRecord* StudentDatabase::findRecord(int id)
 {
      if (inRange(id))
      {
@@ -31,10 +27,9 @@ const StudentRecord* StudentDatabase::findRecord(long id)
          if(it == m_records.end())
              return nullptr; // failure
          else
-            return &(*it); // success
+             return &(*it); // success
      }
      return nullptr; // failure
-
 }
 
 /**
@@ -44,15 +39,16 @@ const StudentRecord* StudentDatabase::findRecord(long id)
  * @param lastName
  * @param year
  * @param gender
- * @return 0 if successful, 1 if failure
+ * @returns 0 if successful, 1 (id not found) or 2 (id already in database) if failure
  */
-int StudentDatabase::updateRecord(long id, string firstName, string lastName, Year year, Gender gender)
+int StudentDatabase::updateRecord(int id, string firstName, string lastName, Year year, Gender gender)
 {
      if(deleteRecord(id))
-         return 1; // failure
-     if(addRecord(id, firstName,lastName,year,gender))
-        return 1; //failure
-     return 0; // success
+         return ERR_NOT_FOUND; // failure
+     auto result = m_records.insert(StudentRecord(id, firstName,lastName,year,gender));
+     if(result.second == false)
+         return ERR_DUPLICATE_ID; // failure
+     return SUCCESS; // success
 }
 
 /**
@@ -61,50 +57,32 @@ int StudentDatabase::updateRecord(long id, string firstName, string lastName, Ye
  * @param lastName
  * @param year
  * @param gender
- * @returns 0 if successful, 1 if not
+ * @returns 0 if successful, 1 if failure (id already in database)
  */
 int StudentDatabase::addRecord(string firstName, string lastName, Year year, Gender gender)
 {
     auto result = m_records.insert(StudentRecord(m_sys_id, firstName,lastName,year,gender));
     if(result.second == false)
-        return 1; // failure
+        return ERR_DUPLICATE_ID; // failure
     m_sys_id++; // increment the current system id
-    return 0; // success
-
-}
-
-/**
- * @brief addRecord - Add a student record to the database --* this version is to be
- *                    called by updateRecord
- * @param id
- * @param firstName
- * @param lastName
- * @param year
- * @param gender
- * @returns 0 if successful, 1 if not
- */
-int StudentDatabase::addRecord(long id, string firstName, string lastName, Year year, Gender gender)
-{
-    auto result = m_records.insert(StudentRecord(id,firstName,lastName,year,gender));
-    if(result.second == false)
-        return 1; // failure
-    return 0; // success
-
+    return SUCCESS; // success
 }
 
 /**
  * @brief deleteRecord
  * @param id
- * @return 0 if successful, 1 if failure
+ * @returns 0 if successful, 1 (id not found) or 2 (id out of range) if failure
  */
-int StudentDatabase::deleteRecord(long id)
+int StudentDatabase::deleteRecord(int id)
 {
     if (inRange(id))
     {
         if(m_records.erase(StudentRecord(id)))
-            return 0; // success
+            return SUCCESS; // success
+        else
+            return ERR_NOT_FOUND; // failure
     }
-    return 1; // failure
+    return ERR_OUT_OF_RANGE; // failure
 }
 
 /**
@@ -114,44 +92,74 @@ int StudentDatabase::deleteRecord(long id)
  */
 void StudentDatabase::printRecord(const StudentRecord* record)
 {
-    cout << "Id: " << record->getId() << endl;
+    cout << "Id: " << padIdWithZeroes(record->getId()) << endl;
     cout << "Name: " << record->getFirstName() << " " << record->getLastName() << endl;
     cout << "Year: " << getYearString(record->getYear()) << endl;
     cout << "Gender: " << (record->getGender() == male ? "male" : "female") << endl;
+    cout << '\n';
 }
 
 /**
  * @brief StudentDatabase::printAllRecords - Print all student records
- * @param id
  */
 void StudentDatabase::printAllRecords()
 {
+    cout << "Printing all student records...\n\n";
     set<StudentRecord>::iterator it = m_records.begin();
     for(; it != m_records.end(); it++)
     {
-        cout << "Id: " << it->getId() << endl;
-        cout << "Name: " << it->getFirstName() << " " << it->getLastName() << endl;
-        cout << "Year: " << getYearString(it->getYear()) << endl;
-        cout << "Gender: " << (it->getGender() == male ? "male" : "female") << endl;
+        printRecord(&(*it));
     }
 }
 
 /**
- * @brief printAllInYear - Print all of the students that belong to a given year of
- *                         graduation.
+ * @brief printAllInYear - Print all of the students that beint to a given year of
+ *                         graduation
  * @param year
  */
 void StudentDatabase::printAllInYear(Year year)
 {
     set<StudentRecord>::iterator it = m_records.begin();
+    cout << "Printing all " << getYearString(year) << " students...\n\n";
     for(; it != m_records.end(); it++)
     {
         if(it->getYear() == year)
-        {
-            cout << "Id: " << it->getId() << endl;
-            cout << "Name: " << it->getFirstName() << " " << it->getLastName() << endl;
-            cout << "Year: " << getYearString(it->getYear()) << endl;
-            cout << "Gender: " << (it->getGender() == male ? "male" : "female") << endl;
-        }
+            printRecord(&(*it));
     }
+}
+
+/**
+ * @brief StudentDatabase::saveAllRecords - Save all student records to a file
+ *                                          specified by user
+ * @param filename
+ * @returns 0 if success, 1 if failure
+ */
+int StudentDatabase::saveAllRecords(string filePath)
+{
+    if(filePath.empty())
+        return ERR_NOT_FOUND; // failure
+    ofstream file (filePath);
+    if(!file)
+        return ERR_NOT_FOUND; // failure
+    set<StudentRecord>::iterator it = m_records.begin();
+    for(; it != m_records.end(); it++)
+    {
+        file << " " << it->getId() << " " << it->getFirstName() << " " << it->getLastName()
+              << " " << it->getYear() << " " << it->getGender();
+    }
+    file.close();
+    return SUCCESS; // success
+}
+
+/**
+ * @brief StudentApp::padWithZeroes - Take a numeric student id, convert to string,
+ *                                    and pad it with zeroes so that it is 9 digits int
+ * @param id
+ * @return
+ */
+std::string padIdWithZeroes(int id)
+{
+    std::string original_id = std::to_string(id);
+    std::string padded_id = std::string(9-original_id.length(), '0') + original_id;
+    return padded_id;
 }
