@@ -13,7 +13,7 @@ static const char* yearStrings[] = {"freshman", "sophomore", "junior", "senior"}
 class StudentRecord
 {
 public:
-    StudentRecord(long id, std::string firstName, std::string lastName, Year year, Gender gender)
+    StudentRecord(int id, std::string firstName, std::string lastName, Year year, Gender gender)
     {
         m_id = id;
         m_firstName = firstName;
@@ -21,19 +21,19 @@ public:
         m_year = year;
         m_gender = gender;
     }
-    StudentRecord(long id)
+    StudentRecord(int id)
     {
         m_id = id; // constructor for performing lookups
     }
 
-    long getId() const {return m_id;}
+    int getId() const {return m_id;}
     std::string getFirstName() const {return m_firstName;}
     std::string getLastName() const {return m_lastName;}
     Year getYear() const {return m_year;}
     Gender getGender() const {return m_gender;}
 
 private:
-    long m_id;
+    int m_id;
     std::string m_firstName;
     std::string m_lastName;
     Year m_year;
@@ -50,5 +50,6 @@ struct StudentRecordCompare
         return (record1.getId() < record2.getId());
     }
 };
+extern std::string padIdWithZeroes(int); // defined in StudenDatabase.cpp
 
 #endif // STUDENTRECORD_H

@@ -1,12 +1,10 @@
-#include <StudentRecord.h>
-#include <StudentDatabase.h>
 #include <StudentApp.h>
-
-using namespace std;
 
 int main()
 {
-    StudentApp app = StudentApp();
+    // get our app with a blank database
+    StudentApp app = StudentApp(StudentDatabase());
+    // run it
     app.run();
 
     return 0;

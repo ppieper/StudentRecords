@@ -1,8 +1,6 @@
 #ifndef STUDENTAPP_H
 #define STUDENTAPP_H
 
-#include <string>
-#include <StudentRecord.h>
 #include <StudentDatabase.h>
 
 /**
@@ -11,20 +9,25 @@
 class StudentApp
 {
 public:
-    StudentApp();
+    StudentApp(StudentDatabase database)
+    {
+        m_database = database;
+    }
 
     void run();
     void promptLoad();
     void promptSave();
     void promptContinue();
-    void displayMenu();
+    void displayMainMenu();
+    void printAllRecords();
+    bool isIdValid(std::string);
 
     void promptAddStudent();
     void promptRemoveStudent();
     void promptModifyStudent();
 
-    std::string promptFirstName();
-    std::string promptLastName();
+    std::string promptFirstName(std::string);
+    std::string promptLastName(std::string);
     Year promptYear();
     Gender promptGender();
 
@@ -32,7 +35,7 @@ public:
     void promptPrintStudentsInYear();
 
 private:
-    StudentDatabase m_records;
+    StudentDatabase m_database;
 };
 
 

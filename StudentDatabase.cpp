@@ -1,6 +1,4 @@
 #include <StudentDatabase.h>
-#include <string>
-#include <set>
 #include <iostream>
 
 using namespace std;
@@ -10,7 +8,7 @@ using namespace std;
  * @param id
  * @returns true if id is within range, false if it is not
  */
-bool StudentDatabase::inRange(long id)
+bool StudentDatabase::inRange(int id)
 {
     return !(id < 0 || id >= m_sys_id);
 }
@@ -21,7 +19,7 @@ bool StudentDatabase::inRange(long id)
  * @param id
  * @returns StudentRecord* if successful, nullptr if failure
  */
-const StudentRecord* StudentDatabase::findRecord(long id)
+const StudentRecord* StudentDatabase::findRecord(int id)
 {
      if (inRange(id))
      {
@@ -43,7 +41,7 @@ const StudentRecord* StudentDatabase::findRecord(long id)
  * @param gender
  * @returns 0 if successful, 1 (id not found) or 2 (id already in database) if failure
  */
-int StudentDatabase::updateRecord(long id, string firstName, string lastName, Year year, Gender gender)
+int StudentDatabase::updateRecord(int id, string firstName, string lastName, Year year, Gender gender)
 {
      if(deleteRecord(id))
          return ERR_NOT_FOUND; // failure
@@ -75,7 +73,7 @@ int StudentDatabase::addRecord(string firstName, string lastName, Year year, Gen
  * @param id
  * @returns 0 if successful, 1 (id not found) or 2 (id out of range) if failure
  */
-int StudentDatabase::deleteRecord(long id)
+int StudentDatabase::deleteRecord(int id)
 {
     if (inRange(id))
     {
@@ -94,7 +92,7 @@ int StudentDatabase::deleteRecord(long id)
  */
 void StudentDatabase::printRecord(const StudentRecord* record)
 {
-    cout << "Id: " << record->getId() << endl;
+    cout << "Id: " << padIdWithZeroes(record->getId()) << endl;
     cout << "Name: " << record->getFirstName() << " " << record->getLastName() << endl;
     cout << "Year: " << getYearString(record->getYear()) << endl;
     cout << "Gender: " << (record->getGender() == male ? "male" : "female") << endl;
@@ -114,8 +112,8 @@ void StudentDatabase::printAllRecords()
 }
 
 /**
- * @brief printAllInYear - Print all of the students that belong to a given year of
- *                         graduation.
+ * @brief printAllInYear - Print all of the students that beint to a given year of
+ *                         graduation
  * @param year
  */
 void StudentDatabase::printAllInYear(Year year)
@@ -130,12 +128,17 @@ void StudentDatabase::printAllInYear(Year year)
 
 /**
  * @brief StudentDatabase::saveAllRecords - Save all student records to a file
- *                                          specified by user.
+ *                                          specified by user
  * @param filename
+ * @returns 0 if success, 1 if failure
  */
-void StudentDatabase::saveAllRecords(string filePath)
+int StudentDatabase::saveAllRecords(string filePath)
 {
+    if(filePath.empty())
+        return ERR_NOT_FOUND; // failure
     ofstream file (filePath);
+    if(!file)
+        return ERR_NOT_FOUND; // failure
     set<StudentRecord>::iterator it = m_records.begin();
     for(; it != m_records.end(); it++)
     {
@@ -143,4 +146,18 @@ void StudentDatabase::saveAllRecords(string filePath)
               << " " << it->getYear() << " " << it->getGender();
     }
     file.close();
+    return SUCCESS; // success
+}
+
+/**
+ * @brief StudentApp::padWithZeroes - Take a numeric student id, convert to string,
+ *                                    and pad it with zeroes so that it is 9 digits int
+ * @param id
+ * @return
+ */
+std::string padIdWithZeroes(int id)
+{
+    std::string original_id = std::to_string(id);
+    std::string padded_id = std::string(9-original_id.length(), '0') + original_id;
+    return padded_id;
 }
