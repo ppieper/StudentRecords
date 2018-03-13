@@ -1,4 +1,3 @@
-#include <iostream>
 #include <StudentRecord.h>
 #include <StudentDatabase.h>
 #include <set>
@@ -7,15 +6,32 @@ using namespace std;
 
 int main()
 {
+    string loadFile;
+    char choice;
+    do
+    {
+        cout << "Load from a file? (y/n) :=> ";
+        cin >> choice;
+        choice = tolower(choice);
+        if(choice == 'n')
+            break;
+        else if(choice == 'y')
+        {
+                cout << "Enter filename to load :=> ";
+                cin >> loadFile;
+                break;
+        }
+    } while (choice !='n' && choice != 'y');
 
-    StudentDatabase records = StudentDatabase(); // get our database
+    StudentDatabase records = StudentDatabase(loadFile); // get our database
 
     // testing database functions for now
 
     // populate the database
-    records.addRecord("Alaska","",freshman,female);
-    records.addRecord("Detox","",sophomore,male);
+    records.addRecord("Alaska","T",freshman,female);
+    records.addRecord("Detox","S",sophomore,male);
     records.addRecord("Roxxxy","Andrews",junior,female);
+    records.addRecord("Paul","Pieper",senior, male);
 
     // print all sophomores
     cout << endl << "Listing sophomores:" << endl;
@@ -78,5 +94,11 @@ int main()
     // print all
     cout << endl << "Listing all students:" << endl;
     records.printAllRecords();
+
+    // save record
+    cout << "Enter a name for the savefile :=> ";
+    string saveFile;
+    cin >> saveFile;
+    records.saveAllRecords(saveFile);
     return 0;
 }

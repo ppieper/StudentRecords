@@ -3,6 +3,8 @@
 
 #include <set>
 #include <string>
+#include <iostream>
+#include <fstream>
 #include <StudentRecord.h>
 
 const int SUCCESS          = 0;
@@ -16,8 +18,34 @@ const int ERR_DUPLICATE_ID = 3;
 class StudentDatabase
 {
 public:
-    StudentDatabase(){
+    StudentDatabase(std::string filePath){
         m_sys_id = 0;
+
+        // no file given
+        if(filePath.empty())
+            return;
+
+        std::ifstream inFile(filePath);
+
+        // file given is not valid
+        if(!inFile)
+        {
+            std::cout << "Could not find file: " << filePath << "\n";
+            return;
+        }
+
+        // else load file
+        long id = 0;
+        std::string firstName, lastName;
+        int year;
+        int gender;
+        while (inFile.good())
+        {
+            inFile >> id; inFile >> firstName >> lastName >> year >> gender;
+            m_records.insert(StudentRecord(id,firstName,lastName,(Year)year,(Gender)gender));
+            m_sys_id = id + 1;
+        }
+        inFile.close();
     }
 
     std::set<StudentRecord, StudentRecordCompare> getDatabase() const {return m_records;}
@@ -34,6 +62,7 @@ public:
     void printAllInYear(Year);
     void printAllRecords();
     void printRecord(const StudentRecord*);
+    void saveAllRecords(std::string);
 
 private:
     std::set<StudentRecord, StudentRecordCompare> m_records;

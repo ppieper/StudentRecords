@@ -29,7 +29,7 @@ const StudentRecord* StudentDatabase::findRecord(long id)
          if(it == m_records.end())
              return nullptr; // failure
          else
-            return &(*it); // success
+             return &(*it); // success
      }
      return nullptr; // failure
 }
@@ -125,4 +125,21 @@ void StudentDatabase::printAllInYear(Year year)
         if(it->getYear() == year)
             printRecord(&(*it));
     }
+}
+
+/**
+ * @brief StudentDatabase::saveAllRecords - Save all student records to a file
+ *                                          specified by user.
+ * @param filename
+ */
+void StudentDatabase::saveAllRecords(string filePath)
+{
+    ofstream file (filePath);
+    set<StudentRecord>::iterator it = m_records.begin();
+    for(; it != m_records.end(); it++)
+    {
+        file << " " << it->getId() << " " << it->getFirstName() << " " << it->getLastName()
+              << " " << it->getYear() << " " << it->getGender();
+    }
+    file.close();
 }
