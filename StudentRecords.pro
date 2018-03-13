@@ -4,8 +4,10 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += main.cpp \
-    StudentDatabase.cpp
+    StudentDatabase.cpp \
+    StudentApp.cpp
 
 HEADERS += \
     StudentRecord.h \
-    StudentDatabase.h
+    StudentDatabase.h \
+    StudentApp.h

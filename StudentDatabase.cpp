@@ -98,6 +98,7 @@ void StudentDatabase::printRecord(const StudentRecord* record)
     cout << "Name: " << record->getFirstName() << " " << record->getLastName() << endl;
     cout << "Year: " << getYearString(record->getYear()) << endl;
     cout << "Gender: " << (record->getGender() == male ? "male" : "female") << endl;
+    cout << '\n';
 }
 
 /**

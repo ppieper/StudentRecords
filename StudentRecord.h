@@ -1,7 +1,7 @@
 #ifndef STUDENTRECORD_H
 #define STUDENTRECORD_H
 
-#include<string>
+#include <string>
 
 enum Gender {male, female};
 enum Year {freshman, sophomore, junior, senior};
