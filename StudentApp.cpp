@@ -1,6 +1,9 @@
 #include <StudentApp.h>
 #include <iostream>
 
+const int NAME_MIN = 2;
+const int NAME_MAX = 35;
+
 using namespace std;
 
 /**
@@ -14,7 +17,7 @@ void StudentApp::run()
     {
         displayMainMenu();
         cin >> choice;
-        cin.ignore();
+        cin.ignore(INT32_MAX, '\n');
         choice = tolower(choice);
         switch (choice)
         {
@@ -89,10 +92,10 @@ void StudentApp::promptPrintStudentsInYear()
     Year year = promptYear(no_year);
     switch (year)
     {
-        case freshman: m_database.printAllInYear(year); promptContinue(); break;
-        case sophomore: m_database.printAllInYear(year); promptContinue(); break;
-        case junior: m_database.printAllInYear(year); promptContinue(); break;
-        case senior: m_database.printAllInYear(year); promptContinue(); break;
+        case freshman: m_database.printStudentsInYear(year); promptContinue(); break;
+        case sophomore: m_database.printStudentsInYear(year); promptContinue(); break;
+        case junior: m_database.printStudentsInYear(year); promptContinue(); break;
+        case senior: m_database.printStudentsInYear(year); promptContinue(); break;
         case no_year: return; break;
         default: break;
     }
@@ -120,7 +123,7 @@ int StudentApp::promptStudentId()
         cout << "Press 'q' to return to menu\n";
         cout << "\nEnter a 9-digit student id :=> ";
         cin >> choice;
-        cin.ignore();
+        cin.ignore(INT32_MAX, '\n');
         cout << endl;
     } while (choice !="q" && choice != "Q" && !isIdValid(choice));
 
@@ -143,8 +146,9 @@ string StudentApp::promptFirstName(string original)
         cout << "Press 'q' to return to menu\n";
         cout << "\nEnter your choice :=> ";
         cin >> choice;
-        cin.ignore();
-    } while (choice !="q" && choice != "Q" && choice.length() < 2);
+        cin.ignore(INT32_MAX, '\n');
+    } while (choice !="q" && choice != "Q" && (choice.length() < NAME_MIN ||
+                                               choice.length() > NAME_MAX));
 
     if (choice == "q" || choice == "Q")
         return original;
@@ -165,8 +169,9 @@ string StudentApp::promptLastName(string original)
         cout << "\nPress 'q' to return to menu\n";
         cout << "\nEnter your choice :=> ";
         cin >> choice;
-        cin.ignore();
-    } while (choice !="q" && choice != "Q" && choice.length() < 2);
+        cin.ignore(INT32_MAX, '\n');
+    } while (choice !="q" && choice != "Q" && (choice.length() < NAME_MIN ||
+                                               choice.length() > NAME_MAX));
 
     if (choice == "q" || choice == "Q")
         return original;
@@ -176,7 +181,7 @@ string StudentApp::promptLastName(string original)
 
 /**
  * @brief StudentApp::promptYear - Prompt user to make a year selection
- * @return Year year - the selected year or 'freshman' by default
+ * @return Year year - the selected year or the previous gender by default
  */
 Year StudentApp::promptYear(Year original)
 {
@@ -191,7 +196,7 @@ Year StudentApp::promptYear(Year original)
         cout << "Press 'q' to return to menu\n";
         cout << "\nSelect your choice :=> ";
         cin >> choice;
-        cin.ignore();
+        cin.ignore(INT32_MAX, '\n');
         choice = tolower(choice);
         switch (choice)
         {
@@ -209,7 +214,7 @@ Year StudentApp::promptYear(Year original)
 
 /**
  * @brief StudentApp::promptGender - Prompt user to make a gender selection
- * @return Gender gender - the chosen gender or 'male' by default
+ * @return Gender gender - the chosen gender or the previous gender by default
  */
 Gender StudentApp::promptGender(Gender original)
 {
@@ -222,7 +227,7 @@ Gender StudentApp::promptGender(Gender original)
         cout << "Press 'q' to return to menu\n";
         cout << "\nSelect your choice :=> ";
         cin >> choice;
-        cin.ignore();
+        cin.ignore(INT32_MAX, '\n');
         choice = tolower(choice);
         switch (choice)
         {
@@ -284,7 +289,7 @@ void StudentApp::promptRemoveStudent()
     {
         cout << "Delete this record? (y/n) :=> ";
         cin >> choice;
-        cin.ignore();
+        cin.ignore(INT32_MAX, '\n');
         choice = tolower(choice);
         cout << endl;
         if(choice == 'n')
@@ -354,7 +359,7 @@ void StudentApp::promptSave()
     string saveFile;
     cout << "Enter filename to save or 'q' to return to menu :=> ";
     cin >> saveFile;
-    cin.ignore();
+    cin.ignore(INT32_MAX, '\n');
     if (saveFile == "q")
         return;
     if(m_database.saveAllRecords(saveFile))
@@ -379,7 +384,7 @@ void StudentApp::promptLoad()
     {
         cout << "Load from a file? Current db will be lost (y/n) :=> ";
         cin >> choice;
-        cin.ignore();
+        cin.ignore(INT32_MAX, '\n');
         choice = tolower(choice);
         if(choice == 'n')
             return;
@@ -387,7 +392,7 @@ void StudentApp::promptLoad()
         {
             cout << "Enter filename to load or 'q' to return to menu :=> ";
             cin >> loadFile;
-            cin.ignore();
+            cin.ignore(INT32_MAX, '\n');
             cout << endl;
             if (loadFile == "q")
                 return;
@@ -412,7 +417,7 @@ int StudentApp::promptEditRecordFields(const StudentRecord* record)
     string firstName = "Jane";
     string lastName = "Doe";
     Year year = freshman;
-    Gender gender = male;
+    Gender gender = female;
 
     // if we are given a record, use its values
     if(record)
@@ -436,7 +441,7 @@ int StudentApp::promptEditRecordFields(const StudentRecord* record)
         cout << "Press 'q' to return to menu\n";
         cout << "\nSelect your choice :=> ";
         cin >> choice;
-        cin.ignore();
+        cin.ignore(INT32_MAX, '\n');
         choice = tolower(choice);
         cout << endl;
         switch (choice)
@@ -471,7 +476,7 @@ int StudentApp::promptEditRecordFields(const StudentRecord* record)
 void StudentApp::promptContinue()
 {
     cout << "Press enter to continue :=> ";
-    cin.ignore();
+    cin.ignore(INT32_MAX, '\n');
     cout << endl;
 }
 
