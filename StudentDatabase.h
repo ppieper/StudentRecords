@@ -36,7 +36,7 @@ public:
     bool inRange(int);
     int getCurrentId() const {return m_sys_id;}
 
-    void printAllInYear(Year);
+    void printStudentsInYear(Year);
     void printAllRecords();
     void printRecord(const StudentRecord*);
     int saveAllRecords(std::string);

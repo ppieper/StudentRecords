@@ -113,19 +113,28 @@ void StudentDatabase::printAllRecords()
 }
 
 /**
- * @brief printAllInYear - Print all of the students that beint to a given year of
- *                         graduation
+ * @brief printStudentsInYear - Print all of the students that belong to a given year of
+ *                              graduation in '#id - firstname lastname' format
  * @param year
  */
-void StudentDatabase::printAllInYear(Year year)
+void StudentDatabase::printStudentsInYear(Year year)
 {
     set<StudentRecord>::iterator it = m_records.begin();
-    cout << "Printing all " << getYearString(year) << " students...\n\n";
+    cout << "\nPrinting all " << getYearString(year) << " students...\n" << endl;
+    bool found = false;
     for(; it != m_records.end(); it++)
     {
         if(it->getYear() == year)
-            printRecord(&(*it));
+        {
+            cout << "# "<< padIdWithZeroes(it->getId()) << " - "
+                 << it->getFirstName() << " " << it->getLastName() << endl;
+            found = true;
+        }
     }
+    if(!found)
+        cout << "(No " <<getYearString(year) << " students found)\n";
+
+    cout << endl;
 }
 
 /**
@@ -155,7 +164,7 @@ int StudentDatabase::saveAllRecords(string filePath)
  * @brief StudentApp::padWithZeroes - Take a numeric student id, convert to string,
  *                                    and pad it with zeroes so that it is 9 digits int
  * @param id
- * @return
+ * @return padded_id the string of 9 digits padded with leading 0's
  */
 std::string padIdWithZeroes(int id)
 {
