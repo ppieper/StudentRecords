@@ -19,6 +19,7 @@ public:
     void printAllRecords();
     bool isIdValid(std::string);
     bool isNameValid(std::string);
+    bool isAlNum(std::string);
     const StudentRecord* findRecord(int);
 
     void promptAddStudent();

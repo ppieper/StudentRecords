@@ -498,14 +498,33 @@ bool StudentApp::isIdValid(string id)
 }
 
 /**
- * @brief StudentApp::isNameValid - Return true if the name is valid aka within range, no digits
+ * @brief StudentApp::isNameValid - Return true if the name is valid;
+ *                                  -is between 2 and 35 chars
+ *                                  -contains no digits
+ *                                  -contains no other special chars
  *
  * @param name
  */
 bool StudentApp::isNameValid(string name)
 {
     return ((name.length() >= NAME_MIN && name.length() <= NAME_MAX)
-            && name.find_first_of("012345679") == std::string::npos);
+            && name.find_first_of("012345679") == std::string::npos
+            && isAlNum(name));
+}
+
+/**
+ * @brief StudentApp::isAlNum - check that a string contains all alphanumeric characters
+ * @param name
+ * @return
+ */
+bool StudentApp::isAlNum(string name)
+{
+    for(unsigned int i = 0; i < name.length(); i++)
+    {
+        if(!isalnum(name[i]))
+            return false;
+    }
+    return true;
 }
 
 /**
