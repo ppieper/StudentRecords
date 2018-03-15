@@ -18,6 +18,7 @@ public:
     void displayMainMenu();
     void printAllRecords();
     bool isIdValid(std::string);
+    bool isNameValid(std::string);
     const StudentRecord* findRecord(int);
 
     void promptAddStudent();

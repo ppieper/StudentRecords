@@ -147,8 +147,7 @@ string StudentApp::promptFirstName(string original)
         cout << "\nEnter your choice :=> ";
         cin >> choice;
         cin.ignore(INT32_MAX, '\n');
-    } while (choice !="q" && choice != "Q" && (choice.length() < NAME_MIN ||
-                                               choice.length() > NAME_MAX));
+    } while (choice !="q" && choice != "Q" && !isNameValid(choice));
 
     if (choice == "q" || choice == "Q")
         return original;
@@ -170,8 +169,7 @@ string StudentApp::promptLastName(string original)
         cout << "\nEnter your choice :=> ";
         cin >> choice;
         cin.ignore(INT32_MAX, '\n');
-    } while (choice !="q" && choice != "Q" && (choice.length() < NAME_MIN ||
-                                               choice.length() > NAME_MAX));
+    } while (choice !="q" && choice != "Q" && !isNameValid(choice));
 
     if (choice == "q" || choice == "Q")
         return original;
@@ -487,7 +485,27 @@ void StudentApp::promptContinue()
  */
 bool StudentApp::isIdValid(string id)
 {
-    return (id.length() < 10 && stoi(id) > 0);
+    int converted_id;
+    try {
+        converted_id = stoi(id);
+    }
+    catch(...)
+    {
+        converted_id = -1;
+    }
+
+    return (id.length() < 10 && converted_id > 0);
+}
+
+/**
+ * @brief StudentApp::isNameValid - Return true if the name is valid aka within range, no digits
+ *
+ * @param name
+ */
+bool StudentApp::isNameValid(string name)
+{
+    return ((name.length() >= NAME_MIN && name.length() <= NAME_MAX)
+            && name.find_first_of("012345679") == std::string::npos);
 }
 
 /**
