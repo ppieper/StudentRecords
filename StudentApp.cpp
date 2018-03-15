@@ -147,8 +147,7 @@ string StudentApp::promptFirstName(string original)
         cout << "\nEnter your choice :=> ";
         cin >> choice;
         cin.ignore(INT32_MAX, '\n');
-    } while (choice !="q" && choice != "Q" && (choice.length() < NAME_MIN ||
-                                               choice.length() > NAME_MAX));
+    } while (choice !="q" && choice != "Q" && !isNameValid(choice));
 
     if (choice == "q" || choice == "Q")
         return original;
@@ -170,8 +169,7 @@ string StudentApp::promptLastName(string original)
         cout << "\nEnter your choice :=> ";
         cin >> choice;
         cin.ignore(INT32_MAX, '\n');
-    } while (choice !="q" && choice != "Q" && (choice.length() < NAME_MIN ||
-                                               choice.length() > NAME_MAX));
+    } while (choice !="q" && choice != "Q" && !isNameValid(choice));
 
     if (choice == "q" || choice == "Q")
         return original;
@@ -487,7 +485,46 @@ void StudentApp::promptContinue()
  */
 bool StudentApp::isIdValid(string id)
 {
-    return (id.length() < 10 && stoi(id) > 0);
+    int converted_id;
+    try {
+        converted_id = stoi(id);
+    }
+    catch(...)
+    {
+        converted_id = -1;
+    }
+
+    return (id.length() < 10 && converted_id > 0);
+}
+
+/**
+ * @brief StudentApp::isNameValid - Return true if the name is valid;
+ *                                  -is between 2 and 35 chars
+ *                                  -contains no digits
+ *                                  -contains no other special chars
+ *
+ * @param name
+ */
+bool StudentApp::isNameValid(string name)
+{
+    return ((name.length() >= NAME_MIN && name.length() <= NAME_MAX)
+            && name.find_first_of("012345679") == std::string::npos
+            && isAlNum(name));
+}
+
+/**
+ * @brief StudentApp::isAlNum - check that a string contains all alphanumeric characters
+ * @param name
+ * @return
+ */
+bool StudentApp::isAlNum(string name)
+{
+    for(unsigned int i = 0; i < name.length(); i++)
+    {
+        if(!isalnum(name[i]))
+            return false;
+    }
+    return true;
 }
 
 /**
