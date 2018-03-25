@@ -50,6 +50,6 @@ struct StudentRecordCompare
         return (record1.getId() < record2.getId());
     }
 };
-extern std::string padIdWithZeroes(int); // defined in StudenDatabase.cpp
+extern std::string padIdWithZeroes(int); // defined in StudentDatabase.cpp
 
 #endif // STUDENTRECORD_H
